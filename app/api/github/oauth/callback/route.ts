@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -41,12 +42,12 @@ export async function GET(req: NextRequest) {
   }
 
   // Store token in KV with 5-minute TTL
-  await kv.set(`pact:${state}`, {
+  await redis.set(`pact:${state}`, JSON.stringify({
     platform: "github",
     access_token: data.access_token,
     token_type: data.token_type,
     scope: data.scope,
-  }, { ex: 300 });
+  }), { ex: 300 });
 
   return new NextResponse(
     html("Pact Connected to GitHub!", "You can close this tab and return to your terminal."),

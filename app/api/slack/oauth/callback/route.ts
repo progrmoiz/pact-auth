@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -41,13 +42,13 @@ export async function GET(req: NextRequest) {
   }
 
   // Store tokens in KV with 5-minute TTL, keyed by CLI pickup code
-  await kv.set(`pact:${state}`, {
+  await redis.set(`pact:${state}`, JSON.stringify({
     platform: "slack",
     user_token: data.authed_user?.access_token,
     bot_token: data.access_token,
     team_id: data.team?.id,
     user_id: data.authed_user?.id,
-  }, { ex: 300 }); // 5 min TTL
+  }), { ex: 300 }); // 5 min TTL
 
   return new NextResponse(
     html("Pact Connected to Slack!", "You can close this tab and return to your terminal."),

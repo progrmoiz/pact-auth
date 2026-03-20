@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -42,13 +43,13 @@ export async function GET(req: NextRequest) {
   }
 
   // Store tokens in KV with 5-minute TTL
-  await kv.set(`pact:${state}`, {
+  await redis.set(`pact:${state}`, JSON.stringify({
     platform: "gmail",
     access_token: data.access_token,
     refresh_token: data.refresh_token,
     expiry_date: Date.now() + (data.expires_in * 1000),
     token_type: data.token_type,
-  }, { ex: 300 });
+  }), { ex: 300 });
 
   return new NextResponse(
     html("Pact Connected to Gmail!", "You can close this tab and return to your terminal."),

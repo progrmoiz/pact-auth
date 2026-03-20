@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export async function GET(
   req: NextRequest,
@@ -7,14 +9,15 @@ export async function GET(
 ) {
   const { code } = await params;
   const key = `pact:${code}`;
-  const data = await kv.get(key);
+  const data = await redis.get<string>(key);
 
   if (!data) {
     return NextResponse.json({ status: "pending" }, { status: 202 });
   }
 
   // Delete after pickup — one-time use
-  await kv.del(key);
+  await redis.del(key);
 
-  return NextResponse.json({ status: "ready", tokens: data });
+  const tokens = typeof data === "string" ? JSON.parse(data) : data;
+  return NextResponse.json({ status: "ready", tokens });
 }
