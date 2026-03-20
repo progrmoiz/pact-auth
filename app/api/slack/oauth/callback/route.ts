@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
-const redis = Redis.fromEnv();
+import { redis } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
