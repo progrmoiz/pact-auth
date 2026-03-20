@@ -1,0 +1,46 @@
+{
+  "display_information": {
+    "name": "Pact",
+    "description": "Never drop the ball. Detects unreplied DMs, pending PR reviews, unanswered questions.",
+    "background_color": "#1a1a2e"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Pact",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "redirect_urls": [
+      "https://pact-auth.vercel.app/api/slack/oauth/callback"
+    ],
+    "scopes": {
+      "user": [
+        "channels:history",
+        "channels:read",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "im:read",
+        "im:write",
+        "mpim:history",
+        "mpim:read",
+        "chat:write",
+        "search:read",
+        "users:read"
+      ],
+      "bot": [
+        "chat:write",
+        "im:write"
+      ]
+    }
+  },
+  "settings": {
+    "interactivity": {
+      "is_enabled": false
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
